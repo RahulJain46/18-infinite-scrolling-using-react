@@ -5,14 +5,31 @@ import Contact from './contact'
 class ContactList extends React.Component {
   state = {
     contacts: [],
-    per: 2,
+    per: 8,
     page: 1,
     totalPages: null,
-    hasMore: true,
+    scrolling: false,
   }
 
   componentWillMount() {
     this.loadContacts()
+    this.scrollListener = window.addEventListener('scroll', (e) => {
+      this.handleScroll(e)
+    })
+  }
+  
+  handleScroll = () => {
+    const { scrolling, totalPages, page} = this.state
+    if (scrolling) return
+    if (totalPages <= page) return
+    var lastLi = document.querySelector('ul.contacts > li:last-child')
+    var lastLiOffset = lastLi.offsetTop + lastLi.clientHeight
+    var pageOffset = window.pageYOffset + window.innerHeight
+    var bottomOffset = 20
+    if (pageOffset > lastLiOffset - bottomOffset) {
+      this.loadMore()
+    }
+    
   }
 
   loadContacts = () => {
@@ -21,27 +38,27 @@ class ContactList extends React.Component {
     fetch(url)
       .then(response => response.json())
       .then(json => this.setState({
-        contacts: [...contacts, ...json.contacts]
+        contacts: [...contacts, ...json.contacts],
+        scrolling: false,
+        totalPages: json.total_pages,
       }))
   }
 
   loadMore = () => {
     this.setState(prevState => ({
-      page: prevState.page+1
+      page: prevState.page+1,
+      scrolling: true,
     }), this.loadContacts)
   }
 
   render() {
-    return <div>
-      <ul className="contacts">
-        {
-          this.state.contacts.map(contact => <li key={contact.id}>
-            <Contact {...contact} />
-          </li>)
-        }
-      </ul>
-      <a onClick={this.loadMore}>Load more</a>
-    </div>
+    return <ul className="contacts contact-container">
+      {
+        this.state.contacts.map(contact => <li key={contact.id}>
+          <Contact {...contact} />
+        </li>)
+      }
+    </ul>
   }
 }
 
