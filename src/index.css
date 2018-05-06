@@ -3,3 +3,20 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.container {
+  width: 800px;
+  margin: 0 auto;
+}
+
+.contacts {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.contact {
+  border: 1px solid rgb(140, 9, 180);
+  margin: 8px 0;
+  padding: 20px;
+}
